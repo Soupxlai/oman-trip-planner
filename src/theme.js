@@ -7,7 +7,7 @@ export const theme = createTheme({
     background: { default: '#fafaf9', paper: '#ffffff' },
   },
   typography: {
-    fontFamily: '"Inter", "Roboto", sans-serif',
+    fontFamily: '"Manrope", "Roboto", sans-serif',
     h4: { fontWeight: 700 },
     h6: { fontWeight: 600 },
   },
