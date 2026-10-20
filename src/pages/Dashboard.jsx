@@ -255,38 +255,39 @@ export default function Dashboard() {
 
       {/* Hero */}
       <div style={{
-        borderRadius: 16, padding: '32px 36px', marginBottom: 24,
+        borderRadius: 16, padding: '28px 32px', marginBottom: 24,
         background: 'linear-gradient(135deg, #b45309 0%, #ea580c 100%)',
-        color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16,
+        color: 'white',
       }}>
-        <div>
-          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Family Trip</div>
-          <div style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.1 }}>Oman 🇴🇲</div>
-          <div style={{ color: 'rgba(255,255,255,0.85)', marginTop: 6 }}>{tripMeta.dates} · Ken & Sue</div>
-        </div>
-        <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: '16px 32px' }}>
-          <div style={{ fontSize: 52, fontWeight: 800, lineHeight: 1 }}>{daysLeft}</div>
-          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
-            {daysLeft > 0 ? 'days to go' : "It's time!"}
+        {/* Top row: title + countdown */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+          <div>
+            <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Family Trip</div>
+            <div style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.1 }}>Oman 🇴🇲</div>
+            <div style={{ color: 'rgba(255,255,255,0.85)', marginTop: 6 }}>{tripMeta.dates} · Ken & Sue</div>
+          </div>
+          <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: '16px 32px' }}>
+            <div style={{ fontSize: 52, fontWeight: 800, lineHeight: 1 }}>{daysLeft}</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
+              {daysLeft > 0 ? 'days to go' : "It's time!"}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Stat cards */}
-      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
-        {[
-          { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}` },
-          { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}` },
-          { label: 'Duration', value: '7 nights · 8 days' },
-        ].map(({ label, value }) => (
-          <Col xs={12} md={8} key={label}>
-            <Card bodyStyle={{ padding: '14px 16px' }} style={{ borderColor: '#303030' }}>
-              <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
-              <div style={{ fontSize: 17, fontWeight: 700, marginTop: 4 }}>{value}</div>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+        {/* Stat pills inside banner */}
+        <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+          {[
+            { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}` },
+            { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}` },
+            { label: 'Duration', value: '7 nights · 8 days' },
+          ].map(({ label, value }) => (
+            <div key={label} style={{ background: 'rgba(0,0,0,0.25)', borderRadius: 10, padding: '10px 16px', flex: '1 1 140px' }}>
+              <div style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: 1, color: 'rgba(255,255,255,0.6)', marginBottom: 4 }}>{label}</div>
+              <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Itinerary */}
       <Title level={4} style={{ marginBottom: 16 }}>Itinerary</Title>
