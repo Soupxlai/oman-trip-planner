@@ -1,10 +1,9 @@
 import { useState } from 'react'
-import {
-  Box, Card, CardContent, Chip, Grid, Typography,
-  Stack, Divider, Alert,
-} from '@mui/material'
+import { Card, Col, Row, Tag, Typography, Alert, Divider, Space } from 'antd'
 import { Plane, PlaneTakeoff, PlaneLanding, Hotel, Clock, Wallet } from 'lucide-react'
 import { tripMeta, budget, flights, itinerary, hotels } from '../data/tripData'
+
+const { Title, Text } = Typography
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -26,7 +25,6 @@ const hotelByDate = Object.fromEntries(
   hotels.map(h => [h.nightOf.replace(' Nov', ' Nov 2026'), h])
 )
 
-// Flights that depart on each date
 const flightsByDate = flights.reduce((acc, f) => {
   const match = f.outbound.match(/\((\d+ NOV)\)/)
   if (match) {
@@ -37,59 +35,69 @@ const flightsByDate = flights.reduce((acc, f) => {
   return acc
 }, {})
 
-// Day cost = sum of itinerary items for that date
 function dayCost(date) {
   return itinerary.filter(e => e.date === date).reduce((s, e) => s + (e.hkd || 0), 0)
 }
 
-// ── sub-components ────────────────────────────────────────────────────────────
+const cabinColorMap = { Economy: 'blue', 'Premium Economy': 'purple' }
+const categoryColorMap = { 'Self-funded': 'default', 'Company-covered': 'green', 'Asia Miles / Self-funded': 'orange' }
+
+// ── Flight card ───────────────────────────────────────────────────────────────
 
 function FlightCard({ f }) {
   return (
-    <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2, mt: 1 }}>
-      <Box display="flex" alignItems="center" gap={1} mb={1}>
+    <Card
+      size="small"
+      style={{ marginBottom: 8, background: '#fafaf9', borderColor: '#e5e7eb' }}
+      bodyStyle={{ padding: '12px 16px' }}
+    >
+      <Space align="center" style={{ marginBottom: 10 }}>
         <Plane size={14} color="#b45309" />
-        <Typography variant="caption" fontWeight={600} color="primary.main" textTransform="uppercase">
-          {f.airline}
-        </Typography>
-        <Chip label={f.cabinClass} size="small" variant="outlined" color="info" sx={{ height: 18, fontSize: 11 }} />
-        <Chip label={f.person} size="small" variant="outlined" sx={{ height: 18, fontSize: 11 }} />
-      </Box>
-      <Grid container spacing={1.5}>
-        <Grid item xs={12} sm={f.inbound && f.inbound !== '/' ? 6 : 12}>
-          <Box sx={{ bgcolor: 'white', borderRadius: 1.5, p: 1.5, border: '1px solid', borderColor: 'divider' }}>
-            <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+        <Text strong style={{ fontSize: 13 }}>{f.airline}</Text>
+        <Tag color={cabinColorMap[f.cabinClass] || 'default'}>{f.cabinClass}</Tag>
+        <Tag>{f.person}</Tag>
+        <Tag color={categoryColorMap[f.category] || 'default'}>{f.category}</Tag>
+      </Space>
+
+      <Row gutter={12}>
+        <Col xs={24} sm={f.inbound && f.inbound !== '/' ? 12 : 24}>
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 12px' }}>
+            <Space style={{ marginBottom: 4 }}>
               <PlaneTakeoff size={12} color="#b45309" />
-              <Typography variant="caption" color="text.secondary" fontWeight={600}>Outbound</Typography>
-            </Box>
-            <Typography variant="body2" fontWeight={600}>{f.outbound}</Typography>
-            <Typography variant="caption" color="text.secondary">{f.outboundTime}</Typography>
-          </Box>
-        </Grid>
+              <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>Outbound</Text>
+            </Space>
+            <div><Text strong style={{ fontSize: 13 }}>{f.outbound}</Text></div>
+            <Text type="secondary" style={{ fontSize: 12 }}>{f.outboundTime}</Text>
+          </div>
+        </Col>
         {f.inbound && f.inbound !== '/' && (
-          <Grid item xs={12} sm={6}>
-            <Box sx={{ bgcolor: 'white', borderRadius: 1.5, p: 1.5, border: '1px solid', borderColor: 'divider' }}>
-              <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+          <Col xs={24} sm={12}>
+            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 12px', marginTop: window.innerWidth < 576 ? 8 : 0 }}>
+              <Space style={{ marginBottom: 4 }}>
                 <PlaneLanding size={12} color="#0891b2" />
-                <Typography variant="caption" color="text.secondary" fontWeight={600}>Inbound</Typography>
-              </Box>
-              <Typography variant="body2" fontWeight={600}>{f.inbound}</Typography>
-              <Typography variant="caption" color="text.secondary">{f.inboundTime}</Typography>
-            </Box>
-          </Grid>
+                <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>Inbound</Text>
+              </Space>
+              <div><Text strong style={{ fontSize: 13 }}>{f.inbound}</Text></div>
+              <Text type="secondary" style={{ fontSize: 12 }}>{f.inboundTime}</Text>
+            </div>
+          </Col>
         )}
-      </Grid>
-      {f.totalHKD > 0 && (
-        <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5, display: 'block' }}>
-          Cost: <strong>HKD {f.totalHKD.toLocaleString()}</strong>
-        </Typography>
-      )}
-      {f.category === 'Company-covered' && (
-        <Chip label="Company covered ✓" color="success" size="small" sx={{ mt: 0.5 }} />
-      )}
-    </Box>
+      </Row>
+
+      <div style={{ marginTop: 8 }}>
+        {f.totalHKD > 0 ? (
+          <Text type="secondary" style={{ fontSize: 12 }}>Cost: <Text strong>HKD {f.totalHKD.toLocaleString()}</Text></Text>
+        ) : f.category === 'Company-covered' ? (
+          <Tag color="green">Company covered ✓</Tag>
+        ) : (
+          <Tag color="orange">Asia Miles</Tag>
+        )}
+      </div>
+    </Card>
   )
 }
+
+// ── Day section ───────────────────────────────────────────────────────────────
 
 function DaySection({ date }) {
   const events = itinerary.filter(e => e.date === date)
@@ -98,134 +106,140 @@ function DaySection({ date }) {
   const cost = dayCost(date)
 
   return (
-    <Box>
-      {/* Hotel banner */}
+    <div>
       {hotel && (
         <Alert
           icon={<Hotel size={16} />}
-          severity="info"
-          sx={{ mb: 1.5, borderRadius: 2, bgcolor: '#fffbeb', color: '#92400e', border: '1px solid #fde68a', '& .MuiAlert-icon': { color: '#b45309' } }}
-        >
-          <Typography variant="body2" fontWeight={600}>{hotel.hotel}</Typography>
-          {hotel.hkdPerNight > 0 && (
-            <Typography variant="caption">HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}</Typography>
-          )}
-        </Alert>
+          showIcon
+          style={{ marginBottom: 12, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10 }}
+          message={<Text strong style={{ color: '#92400e' }}>{hotel.hotel}</Text>}
+          description={hotel.hkdPerNight > 0
+            ? <Text style={{ color: '#a16207', fontSize: 12 }}>HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}</Text>
+            : null}
+        />
       )}
 
-      {/* Flights for this day */}
       {dayFlights.map((f, i) => <FlightCard key={i} f={f} />)}
 
-      {/* Activity timeline */}
-      <Stack spacing={1} sx={{ mt: dayFlights.length ? 1.5 : 0 }}>
+      <div style={{ marginTop: dayFlights.length ? 12 : 0 }}>
         {events.map((e, i) => (
-          <Card key={i} variant="outlined">
-            <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', py: '10px !important', px: 2 }}>
-              <Box sx={{ minWidth: 72, textAlign: 'center' }}>
-                <Box display="flex" alignItems="center" gap={0.5} justifyContent="center">
+          <Card
+            key={i}
+            size="small"
+            variant="outlined"
+            style={{ marginBottom: 8, borderColor: '#e5e7eb' }}
+            bodyStyle={{ padding: '10px 16px' }}
+          >
+            <Row align="top" gutter={12} wrap={false}>
+              <Col style={{ minWidth: 76, textAlign: 'center' }}>
+                <Space size={3}>
                   <Clock size={11} color="#9ca3af" />
-                  <Typography variant="caption" color="text.secondary">{fmt(e.timeStart)}</Typography>
-                </Box>
+                  <Text type="secondary" style={{ fontSize: 11 }}>{fmt(e.timeStart)}</Text>
+                </Space>
                 {e.timeFinish && e.timeFinish !== '/' && (
                   <>
-                    <Divider sx={{ my: 0.5, borderStyle: 'dashed' }} />
-                    <Typography variant="caption" color="text.disabled">{fmt(e.timeFinish)}</Typography>
+                    <Divider style={{ margin: '4px 0', borderStyle: 'dashed' }} />
+                    <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>{fmt(e.timeFinish)}</Text>
                   </>
                 )}
-              </Box>
-              <Divider orientation="vertical" flexItem />
-              <Box flex={1}>
-                <Typography variant="body2" fontWeight={500}>{e.activity}</Typography>
+              </Col>
+              <Col flex="none">
+                <Divider type="vertical" style={{ height: '100%', margin: '0 4px' }} />
+              </Col>
+              <Col flex="auto">
+                <Text style={{ fontSize: 13, fontWeight: 500 }}>{e.activity}</Text>
                 {e.hkd > 0 && (
-                  <Typography variant="caption" color="text.secondary">
-                    HKD {e.hkd.toLocaleString()}{e.omr > 0 ? ` · OMR ${e.omr}` : ''}
-                  </Typography>
+                  <div>
+                    <Text type="secondary" style={{ fontSize: 11 }}>
+                      HKD {e.hkd.toLocaleString()}{e.omr > 0 ? ` · OMR ${e.omr}` : ''}
+                    </Text>
+                  </div>
                 )}
-              </Box>
-            </CardContent>
+              </Col>
+            </Row>
           </Card>
         ))}
-      </Stack>
+      </div>
 
-      {/* Day cost summary */}
       {cost > 0 && (
-        <Box display="flex" alignItems="center" gap={1} mt={1.5} justifyContent="flex-end">
+        <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 6, marginTop: 8 }}>
           <Wallet size={13} color="#6b7280" />
-          <Typography variant="caption" color="text.secondary">
-            Day total: <strong>HKD {cost.toLocaleString()}</strong>
-          </Typography>
-        </Box>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            Day total: <Text strong>HKD {cost.toLocaleString()}</Text>
+          </Text>
+        </div>
       )}
-    </Box>
+    </div>
   )
 }
 
-// ── main page ─────────────────────────────────────────────────────────────────
+// ── Main page ─────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
   const [activeDay, setActiveDay] = useState(days[0])
-  const days_count = countdown()
+  const daysLeft = countdown()
 
   return (
-    <Box sx={{ maxWidth: 800, mx: 'auto', px: 3, py: 4 }}>
+    <div style={{ maxWidth: 800, margin: '0 auto', padding: '32px 24px' }}>
 
       {/* Hero */}
-      <Box sx={{
-        borderRadius: 3, p: { xs: 3, sm: 4 }, mb: 3,
+      <div style={{
+        borderRadius: 16, padding: '32px 36px', marginBottom: 24,
         background: 'linear-gradient(135deg, #b45309 0%, #ea580c 100%)',
-        color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2,
+        color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16,
       }}>
-        <Box>
-          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.8)', letterSpacing: 2 }}>Family Trip</Typography>
-          <Typography variant="h3" fontWeight={800}>Oman 🇴🇲</Typography>
-          <Typography sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5 }}>{tripMeta.dates} · Ken & Sue</Typography>
-        </Box>
-        <Box sx={{ textAlign: 'center', bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 2, px: 4, py: 2 }}>
-          <Typography variant="h2" fontWeight={800}>{days_count}</Typography>
-          <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem' }}>
-            {days_count > 0 ? 'days to go' : "It's time!"}
-          </Typography>
-        </Box>
-      </Box>
+        <div>
+          <div style={{ fontSize: 11, letterSpacing: 2, textTransform: 'uppercase', color: 'rgba(255,255,255,0.75)', marginBottom: 4 }}>Family Trip</div>
+          <div style={{ fontSize: 40, fontWeight: 800, lineHeight: 1.1 }}>Oman 🇴🇲</div>
+          <div style={{ color: 'rgba(255,255,255,0.85)', marginTop: 6 }}>{tripMeta.dates} · Ken & Sue</div>
+        </div>
+        <div style={{ textAlign: 'center', background: 'rgba(255,255,255,0.2)', borderRadius: 12, padding: '16px 32px' }}>
+          <div style={{ fontSize: 52, fontWeight: 800, lineHeight: 1 }}>{daysLeft}</div>
+          <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', marginTop: 4 }}>
+            {daysLeft > 0 ? 'days to go' : "It's time!"}
+          </div>
+        </div>
+      </div>
 
-      {/* Quick stats */}
-      <Grid container spacing={2} sx={{ mb: 4 }}>
+      {/* Stat cards */}
+      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         {[
           { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}` },
           { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}` },
           { label: 'Duration', value: '7 nights · 8 days' },
           { label: 'Travelers', value: 'Ken + Sue' },
         ].map(({ label, value }) => (
-          <Grid item xs={6} md={3} key={label}>
-            <Card>
-              <CardContent sx={{ pb: '12px !important' }}>
-                <Typography variant="caption" color="text.secondary" textTransform="uppercase" letterSpacing={1}>{label}</Typography>
-                <Typography variant="h6" fontWeight={700} mt={0.5}>{value}</Typography>
-              </CardContent>
+          <Col xs={12} md={6} key={label}>
+            <Card size="small" bodyStyle={{ padding: '14px 16px' }}>
+              <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
+              <div style={{ fontSize: 16, fontWeight: 700, marginTop: 4 }}>{value}</div>
             </Card>
-          </Grid>
+          </Col>
         ))}
-      </Grid>
+      </Row>
 
       {/* Itinerary */}
-      <Typography variant="h5" fontWeight={700} mb={2}>Itinerary</Typography>
+      <Title level={4} style={{ marginBottom: 16 }}>Itinerary</Title>
 
-      {/* Day selector */}
-      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
+      {/* Day chips */}
+      <Space wrap style={{ marginBottom: 20 }}>
         {days.map(d => (
-          <Chip
+          <Tag
             key={d}
-            label={d.replace(' 2026', '')}
             onClick={() => setActiveDay(d)}
-            color={activeDay === d ? 'primary' : 'default'}
-            variant={activeDay === d ? 'filled' : 'outlined'}
-            sx={{ fontWeight: 500 }}
-          />
+            color={activeDay === d ? 'volcano' : 'default'}
+            style={{
+              cursor: 'pointer', fontWeight: 600, padding: '4px 12px',
+              fontSize: 13, borderRadius: 20,
+              border: activeDay === d ? 'none' : '1px solid #d1d5db',
+            }}
+          >
+            {d.replace(' 2026', '')}
+          </Tag>
         ))}
-      </Stack>
+      </Space>
 
       <DaySection date={activeDay} />
-
-    </Box>
+    </div>
   )
 }
