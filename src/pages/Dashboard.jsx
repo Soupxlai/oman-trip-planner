@@ -272,28 +272,17 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Stat cards with cover images */}
+      {/* Stat cards */}
       <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
         {[
-          { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}`, img: 'https://images.unsplash.com/photo-1553913861-c0fddf2619ee?w=400&q=80' },
-          { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}`, img: 'https://images.unsplash.com/photo-1568378780196-d20c8e72f08e?w=400&q=80' },
-          { label: 'Duration', value: '7 nights · 8 days', img: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&q=80' },
-          { label: 'Travelers', value: 'Ken + Sue', img: 'https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=400&q=80' },
-        ].map(({ label, value, img }) => (
-          <Col xs={12} md={6} key={label}>
-            <Card
-              cover={
-                <div style={{ position: 'relative', height: 72, overflow: 'hidden', borderRadius: '10px 10px 0 0' }}>
-                  <img src={img} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'brightness(0.45)' }} />
-                  <div style={{ position: 'absolute', inset: 0, padding: '8px 12px', display: 'flex', alignItems: 'flex-end' }}>
-                    <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: 10, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
-                  </div>
-                </div>
-              }
-              bodyStyle={{ padding: '10px 14px' }}
-              style={{ borderColor: '#303030' }}
-            >
-              <Text strong style={{ fontSize: 15 }}>{value}</Text>
+          { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}` },
+          { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}` },
+          { label: 'Duration', value: '7 nights · 8 days' },
+        ].map(({ label, value }) => (
+          <Col xs={12} md={8} key={label}>
+            <Card bodyStyle={{ padding: '14px 16px' }} style={{ borderColor: '#303030' }}>
+              <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: 1 }}>{label}</Text>
+              <div style={{ fontSize: 17, fontWeight: 700, marginTop: 4 }}>{value}</div>
             </Card>
           </Col>
         ))}
