@@ -1,94 +1,111 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { Box, Card, CardContent, Grid, Typography, LinearProgress, Divider } from '@mui/material'
+import { PieChart } from '@mui/x-charts/PieChart'
 import { tripMeta, budget } from '../data/tripData'
 
-const COLORS = ['#d97706','#0891b2','#16a34a','#9333ea','#dc2626','#ea580c','#0284c7','#84cc16']
+const COLORS = ['#b45309','#0891b2','#16a34a','#9333ea','#dc2626','#ea580c','#0284c7','#84cc16']
 
 function countdown() {
   const dep = new Date(tripMeta.departureDate)
   const now = new Date()
-  const diff = Math.ceil((dep - now) / (1000 * 60 * 60 * 24))
-  return diff
+  return Math.max(0, Math.ceil((dep - now) / (1000 * 60 * 60 * 24)))
 }
 
 export default function Dashboard() {
   const days = countdown()
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 space-y-6">
-      {/* Hero */}
-      <div className="rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 text-white p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <p className="text-amber-100 text-sm font-medium uppercase tracking-wider mb-1">Family Trip</p>
-          <h1 className="text-4xl font-bold">Oman 🇴🇲</h1>
-          <p className="text-amber-100 mt-1">{tripMeta.dates} · Ken & Sue</p>
-        </div>
-        <div className="text-center bg-white/20 rounded-xl px-6 py-4">
-          <p className="text-5xl font-bold">{days > 0 ? days : 0}</p>
-          <p className="text-amber-100 text-sm mt-1">{days > 0 ? 'days to go' : 'Trip is here!'}</p>
-        </div>
-      </div>
+    <Box sx={{ maxWidth: 960, mx: 'auto', px: 3, py: 4 }}>
+      {/* Hero banner */}
+      <Box sx={{
+        borderRadius: 3, p: 4, mb: 3,
+        background: 'linear-gradient(135deg, #b45309 0%, #ea580c 100%)',
+        color: 'white', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 2,
+      }}>
+        <Box>
+          <Typography variant="overline" sx={{ color: 'rgba(255,255,255,0.8)', letterSpacing: 2 }}>Family Trip</Typography>
+          <Typography variant="h3" fontWeight={800}>Oman 🇴🇲</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.85)', mt: 0.5 }}>{tripMeta.dates} · Ken & Sue</Typography>
+        </Box>
+        <Box sx={{ textAlign: 'center', bgcolor: 'rgba(255,255,255,0.2)', borderRadius: 2, px: 4, py: 2 }}>
+          <Typography variant="h2" fontWeight={800}>{days}</Typography>
+          <Typography sx={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem' }}>
+            {days > 0 ? 'days to go' : "It's time!"}
+          </Typography>
+        </Box>
+      </Box>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Stat cards */}
+      <Grid container spacing={2} sx={{ mb: 3 }}>
         {[
           { label: 'Total Budget', value: `HKD ${budget.total.hkd.toLocaleString()}` },
-          { label: 'Nights', value: '7 nights' },
+          { label: 'In Omani Rial', value: `OMR ${budget.total.omr.toLocaleString()}` },
+          { label: 'Duration', value: '7 nights · 8 days' },
           { label: 'Travelers', value: 'Ken + Sue' },
-          { label: 'In OMR', value: `OMR ${budget.total.omr.toLocaleString()}` },
         ].map(({ label, value }) => (
-          <div key={label} className="bg-white rounded-xl border border-stone-200 p-4">
-            <p className="text-stone-500 text-xs uppercase tracking-wide">{label}</p>
-            <p className="text-stone-900 font-bold text-lg mt-1">{value}</p>
-          </div>
+          <Grid item xs={6} md={3} key={label}>
+            <Card>
+              <CardContent sx={{ pb: '12px !important' }}>
+                <Typography variant="caption" color="text.secondary" textTransform="uppercase" letterSpacing={1}>{label}</Typography>
+                <Typography variant="h6" fontWeight={700} mt={0.5}>{value}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
+      </Grid>
 
-      {/* Budget chart + breakdown */}
-      <div className="grid md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-stone-200 p-6">
-          <h2 className="font-semibold text-stone-700 mb-4">Budget by Category</h2>
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={budget.categories} dataKey="hkd" nameKey="name" cx="50%" cy="50%" outerRadius={85} label={({ name, pct }) => `${pct}%`} labelLine={false}>
-                {budget.categories.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
-              </Pie>
-              <Tooltip formatter={(v) => `HKD ${v.toLocaleString()}`} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+      <Grid container spacing={3}>
+        {/* Pie chart */}
+        <Grid item xs={12} md={5}>
+          <Card sx={{ height: '100%' }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Budget Breakdown</Typography>
+              <PieChart
+                series={[{
+                  data: budget.categories.map((c, i) => ({ id: i, value: c.hkd, label: c.name, color: COLORS[i] })),
+                  highlightScope: { faded: 'global', highlighted: 'item' },
+                  innerRadius: 40,
+                }]}
+                height={240}
+                slotProps={{ legend: { hidden: true } }}
+              />
+            </CardContent>
+          </Card>
+        </Grid>
 
-        <div className="bg-white rounded-xl border border-stone-200 p-6">
-          <h2 className="font-semibold text-stone-700 mb-4">Per-Person Split</h2>
-          <div className="space-y-3">
-            {Object.entries(budget.perPerson).map(([person, { hkd }], i) => (
-              <div key={person}>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-stone-600">{person}</span>
-                  <span className="font-medium">HKD {hkd.toLocaleString()}</span>
-                </div>
-                <div className="h-2 bg-stone-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${(hkd / budget.total.hkd) * 100}%`, backgroundColor: COLORS[i] }}
+        {/* Per-person + legend */}
+        <Grid item xs={12} md={7}>
+          <Card>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>Per-Person Split</Typography>
+              {Object.entries(budget.perPerson).map(([person, { hkd }], i) => (
+                <Box key={person} mb={2}>
+                  <Box display="flex" justifyContent="space-between" mb={0.5}>
+                    <Typography variant="body2" fontWeight={500}>{person}</Typography>
+                    <Typography variant="body2" color="text.secondary">HKD {hkd.toLocaleString()}</Typography>
+                  </Box>
+                  <LinearProgress
+                    variant="determinate"
+                    value={(hkd / budget.total.hkd) * 100}
+                    sx={{ height: 8, borderRadius: 4, bgcolor: 'grey.100', '& .MuiLinearProgress-bar': { bgcolor: COLORS[i], borderRadius: 4 } }}
                   />
-                </div>
-              </div>
-            ))}
-          </div>
+                </Box>
+              ))}
 
-          <div className="mt-6 space-y-2">
-            <h3 className="font-semibold text-stone-700 text-sm">Category Breakdown</h3>
-            {budget.categories.map(({ name, hkd, pct }, i) => (
-              <div key={name} className="flex items-center gap-2 text-sm">
-                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: COLORS[i] }} />
-                <span className="flex-1 text-stone-600">{name}</span>
-                <span className="text-stone-500 text-xs">{pct}%</span>
-                <span className="font-medium w-24 text-right">HKD {hkd.toLocaleString()}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="subtitle2" gutterBottom color="text.secondary">Categories</Typography>
+              <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 0.75 }}>
+                {budget.categories.map(({ name, pct }, i) => (
+                  <Box key={name} display="flex" alignItems="center" gap={1}>
+                    <Box sx={{ width: 10, height: 10, borderRadius: '50%', bgcolor: COLORS[i], flexShrink: 0 }} />
+                    <Typography variant="caption" noWrap sx={{ flex: 1 }}>{name}</Typography>
+                    <Typography variant="caption" color="text.secondary">{pct}%</Typography>
+                  </Box>
+                ))}
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </Box>
   )
 }

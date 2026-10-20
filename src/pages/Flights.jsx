@@ -1,55 +1,71 @@
+import { Box, Card, CardContent, Chip, Typography, Grid, Divider, Stack } from '@mui/material'
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
+import FlightLandIcon from '@mui/icons-material/FlightLand'
 import { flights } from '../data/tripData'
-import { Plane } from 'lucide-react'
 
-const cabinColor = { Economy: 'bg-blue-100 text-blue-700', 'Premium Economy': 'bg-purple-100 text-purple-700' }
+const cabinColors = { Economy: 'info', 'Premium Economy': 'secondary' }
+const categoryColors = { 'Self-funded': 'default', 'Company-covered': 'success', 'Asia Miles / Self-funded': 'warning' }
 
 export default function Flights() {
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-stone-800 mb-6">Flights</h1>
-      <div className="space-y-4">
+    <Box sx={{ maxWidth: 960, mx: 'auto', px: 3, py: 4 }}>
+      <Typography variant="h4" gutterBottom>Flights</Typography>
+      <Stack spacing={2}>
         {flights.map((f, i) => (
-          <div key={i} className="bg-white border border-stone-200 rounded-xl p-5">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
-              <div className="flex items-center gap-2">
-                <Plane size={18} className="text-amber-500" />
-                <span className="font-semibold text-stone-800">{f.airline}</span>
-                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${cabinColor[f.cabinClass] || 'bg-stone-100 text-stone-600'}`}>
-                  {f.cabinClass}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-stone-500">👤 {f.person}</span>
-                <span className="text-xs bg-stone-100 text-stone-500 px-2 py-0.5 rounded-full">{f.category}</span>
-              </div>
-            </div>
+          <Card key={i}>
+            <CardContent>
+              {/* Header */}
+              <Box display="flex" justifyContent="space-between" alignItems="flex-start" flexWrap="wrap" gap={1} mb={2}>
+                <Box>
+                  <Typography variant="h6">{f.airline}</Typography>
+                  <Stack direction="row" spacing={1} mt={0.5}>
+                    <Chip label={f.cabinClass} size="small" color={cabinColors[f.cabinClass] || 'default'} variant="outlined" />
+                    <Chip label={f.person} size="small" variant="outlined" />
+                    <Chip label={f.category} size="small" color={categoryColors[f.category] || 'default'} variant="filled" />
+                  </Stack>
+                </Box>
+                {f.totalHKD > 0 ? (
+                  <Typography variant="h6" color="primary.main" fontWeight={700}>
+                    HKD {f.totalHKD.toLocaleString()}
+                  </Typography>
+                ) : f.category === 'Company-covered' ? (
+                  <Chip label="Company covered ✓" color="success" />
+                ) : (
+                  <Chip label="Asia Miles" color="warning" />
+                )}
+              </Box>
 
-            <div className="mt-4 grid md:grid-cols-2 gap-4">
-              <div className="bg-stone-50 rounded-lg p-3">
-                <p className="text-xs text-stone-400 uppercase tracking-wide mb-1">Outbound</p>
-                <p className="font-medium text-stone-800">{f.outbound}</p>
-                <p className="text-sm text-stone-500">{f.outboundTime}</p>
-              </div>
-              {f.inbound && f.inbound !== '/' && (
-                <div className="bg-stone-50 rounded-lg p-3">
-                  <p className="text-xs text-stone-400 uppercase tracking-wide mb-1">Inbound</p>
-                  <p className="font-medium text-stone-800">{f.inbound}</p>
-                  <p className="text-sm text-stone-500">{f.inboundTime}</p>
-                </div>
-              )}
-            </div>
+              <Divider sx={{ mb: 2 }} />
 
-            {f.totalHKD > 0 && (
-              <p className="mt-3 text-sm font-medium text-stone-600">
-                Cost: <span className="text-amber-700">HKD {f.totalHKD.toLocaleString()}</span>
-              </p>
-            )}
-            {f.totalHKD === 0 && f.category === 'Company-covered' && (
-              <p className="mt-3 text-sm text-green-600 font-medium">✓ Company covered</p>
-            )}
-          </div>
+              {/* Route */}
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={f.inbound && f.inbound !== '/' ? 6 : 12}>
+                  <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
+                    <Box display="flex" alignItems="center" gap={1} mb={1}>
+                      <FlightTakeoffIcon fontSize="small" color="primary" />
+                      <Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={600}>Outbound</Typography>
+                    </Box>
+                    <Typography variant="body1" fontWeight={600}>{f.outbound}</Typography>
+                    <Typography variant="body2" color="text.secondary">{f.outboundTime}</Typography>
+                  </Box>
+                </Grid>
+                {f.inbound && f.inbound !== '/' && (
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
+                      <Box display="flex" alignItems="center" gap={1} mb={1}>
+                        <FlightLandIcon fontSize="small" color="secondary" />
+                        <Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={600}>Inbound</Typography>
+                      </Box>
+                      <Typography variant="body1" fontWeight={600}>{f.inbound}</Typography>
+                      <Typography variant="body2" color="text.secondary">{f.inboundTime}</Typography>
+                    </Box>
+                  </Grid>
+                )}
+              </Grid>
+            </CardContent>
+          </Card>
         ))}
-      </div>
-    </div>
+      </Stack>
+    </Box>
   )
 }

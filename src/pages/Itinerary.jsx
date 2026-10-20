@@ -1,8 +1,12 @@
 import { useState } from 'react'
+import { Box, Card, CardContent, Chip, Typography, Stack, Divider, Alert } from '@mui/material'
+import HotelIcon from '@mui/icons-material/Hotel'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import { itinerary, hotels } from '../data/tripData'
 
-const hotelByDate = Object.fromEntries(hotels.map(h => [h.nightOf.replace(' Nov', ' Nov 2026'), h]))
-
+const hotelByDate = Object.fromEntries(
+  hotels.map(h => [h.nightOf.replace(' Nov', ' Nov 2026'), h])
+)
 const days = [...new Set(itinerary.map(e => e.date))]
 
 function fmt(t) {
@@ -12,67 +16,78 @@ function fmt(t) {
 }
 
 export default function Itinerary() {
-  const [openDay, setOpenDay] = useState(days[0])
+  const [activeDay, setActiveDay] = useState(days[0])
+  const events = itinerary.filter(e => e.date === activeDay)
+  const hotel = hotelByDate[activeDay]
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold text-stone-800 mb-6">Itinerary</h1>
+    <Box sx={{ maxWidth: 960, mx: 'auto', px: 3, py: 4 }}>
+      <Typography variant="h4" gutterBottom>Itinerary</Typography>
 
-      <div className="flex gap-2 flex-wrap mb-6">
+      {/* Day selector chips */}
+      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
         {days.map(d => (
-          <button
+          <Chip
             key={d}
-            onClick={() => setOpenDay(d)}
-            className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-              openDay === d ? 'bg-amber-500 text-white' : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
-            }`}
-          >
-            {d.replace(' 2026', '')}
-          </button>
+            label={d.replace(' 2026', '')}
+            onClick={() => setActiveDay(d)}
+            color={activeDay === d ? 'primary' : 'default'}
+            variant={activeDay === d ? 'filled' : 'outlined'}
+            sx={{ fontWeight: 500 }}
+          />
         ))}
-      </div>
+      </Stack>
 
-      {days.map(day => {
-        if (day !== openDay) return null
-        const events = itinerary.filter(e => e.date === day)
-        const hotel = hotelByDate[day]
-        return (
-          <div key={day} className="space-y-3">
-            {hotel && (
-              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center gap-3">
-                <span className="text-xl">🏨</span>
-                <div>
-                  <p className="text-sm font-semibold text-amber-800">{hotel.hotel}</p>
-                  {hotel.hkdPerNight > 0 && (
-                    <p className="text-xs text-amber-600">HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}</p>
-                  )}
-                </div>
-              </div>
-            )}
-            {events.map((e, i) => (
-              <div key={i} className="bg-white border border-stone-200 rounded-xl p-4 flex gap-4">
-                <div className="text-center w-16 shrink-0">
-                  <p className="text-xs text-stone-400">{fmt(e.timeStart)}</p>
-                  {e.timeFinish && e.timeFinish !== '/' && (
-                    <>
-                      <div className="w-px h-4 bg-stone-200 mx-auto my-1" />
-                      <p className="text-xs text-stone-400">{fmt(e.timeFinish)}</p>
-                    </>
-                  )}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium text-stone-800">{e.activity}</p>
-                  {e.hkd > 0 && (
-                    <p className="text-xs text-stone-500 mt-1">
-                      HKD {e.hkd.toLocaleString()} {e.omr > 0 ? `· OMR ${e.omr}` : ''}
-                    </p>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        )
-      })}
-    </div>
+      {/* Hotel for this night */}
+      {hotel && (
+        <Alert
+          icon={<HotelIcon />}
+          severity="info"
+          sx={{ mb: 2, borderRadius: 2, bgcolor: '#fffbeb', color: '#92400e', border: '1px solid #fde68a', '& .MuiAlert-icon': { color: '#b45309' } }}
+        >
+          <Typography variant="body2" fontWeight={600}>{hotel.hotel}</Typography>
+          {hotel.hkdPerNight > 0 && (
+            <Typography variant="caption">
+              HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}
+            </Typography>
+          )}
+        </Alert>
+      )}
+
+      {/* Timeline */}
+      <Stack spacing={1.5}>
+        {events.map((e, i) => (
+          <Card key={i} variant="outlined">
+            <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', py: '12px !important', px: 2 }}>
+              {/* Time column */}
+              <Box sx={{ minWidth: 80, textAlign: 'center' }}>
+                <Box display="flex" alignItems="center" gap={0.5} justifyContent="center">
+                  <AccessTimeIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
+                  <Typography variant="caption" color="text.secondary">{fmt(e.timeStart)}</Typography>
+                </Box>
+                {e.timeFinish && e.timeFinish !== '/' && (
+                  <>
+                    <Divider sx={{ my: 0.5, borderStyle: 'dashed' }} />
+                    <Typography variant="caption" color="text.disabled">{fmt(e.timeFinish)}</Typography>
+                  </>
+                )}
+              </Box>
+
+              <Divider orientation="vertical" flexItem />
+
+              {/* Content */}
+              <Box flex={1}>
+                <Typography variant="body2" fontWeight={500}>{e.activity}</Typography>
+                {e.hkd > 0 && (
+                  <Typography variant="caption" color="text.secondary">
+                    HKD {e.hkd.toLocaleString()}{e.omr > 0 ? ` · OMR ${e.omr}` : ''}
+                  </Typography>
+                )}
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+      </Stack>
+    </Box>
   )
 }
