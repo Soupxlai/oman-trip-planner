@@ -48,7 +48,7 @@ function FlightCard({ f }) {
   return (
     <Card
       size="small"
-      style={{ marginBottom: 8, background: '#fafaf9', borderColor: '#e5e7eb' }}
+      style={{ marginBottom: 8, background: '#1f1f1f', borderColor: '#303030' }}
       bodyStyle={{ padding: '12px 16px' }}
     >
       <Space align="center" style={{ marginBottom: 10 }}>
@@ -61,9 +61,9 @@ function FlightCard({ f }) {
 
       <Row gutter={12}>
         <Col xs={24} sm={f.inbound && f.inbound !== '/' ? 12 : 24}>
-          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 12px' }}>
+          <div style={{ background: '#141414', border: '1px solid #303030', borderRadius: 8, padding: '10px 12px' }}>
             <Space style={{ marginBottom: 4 }}>
-              <PlaneTakeoff size={12} color="#b45309" />
+              <PlaneTakeoff size={12} color="#f59e0b" />
               <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>Outbound</Text>
             </Space>
             <div><Text strong style={{ fontSize: 13 }}>{f.outbound}</Text></div>
@@ -72,7 +72,7 @@ function FlightCard({ f }) {
         </Col>
         {f.inbound && f.inbound !== '/' && (
           <Col xs={24} sm={12}>
-            <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '10px 12px', marginTop: window.innerWidth < 576 ? 8 : 0 }}>
+            <div style={{ background: '#141414', border: '1px solid #303030', borderRadius: 8, padding: '10px 12px', marginTop: window.innerWidth < 576 ? 8 : 0 }}>
               <Space style={{ marginBottom: 4 }}>
                 <PlaneLanding size={12} color="#0891b2" />
                 <Text type="secondary" style={{ fontSize: 11, textTransform: 'uppercase', fontWeight: 600 }}>Inbound</Text>
@@ -111,10 +111,10 @@ function DaySection({ date }) {
         <Alert
           icon={<Hotel size={16} />}
           showIcon
-          style={{ marginBottom: 12, background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 10 }}
-          message={<Text strong style={{ color: '#92400e' }}>{hotel.hotel}</Text>}
+          style={{ marginBottom: 12, background: '#2a1f00', border: '1px solid #78350f', borderRadius: 10 }}
+          message={<Text strong style={{ color: '#fde68a' }}>{hotel.hotel}</Text>}
           description={hotel.hkdPerNight > 0
-            ? <Text style={{ color: '#a16207', fontSize: 12 }}>HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}</Text>
+            ? <Text style={{ color: '#fcd34d', fontSize: 12 }}>HKD {hotel.hkdPerNight.toLocaleString()} / night · OMR {hotel.omrPerNight}</Text>
             : null}
         />
       )}
