@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Box, Card, CardContent, Chip, Typography, Stack, Divider, Alert } from '@mui/material'
-import HotelIcon from '@mui/icons-material/Hotel'
-import AccessTimeIcon from '@mui/icons-material/AccessTime'
+import { Hotel, Clock } from 'lucide-react'
 import { itinerary, hotels } from '../data/tripData'
 
 const hotelByDate = Object.fromEntries(
@@ -24,7 +23,6 @@ export default function Itinerary() {
     <Box sx={{ maxWidth: 960, mx: 'auto', px: 3, py: 4 }}>
       <Typography variant="h4" gutterBottom>Itinerary</Typography>
 
-      {/* Day selector chips */}
       <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap sx={{ mb: 3 }}>
         {days.map(d => (
           <Chip
@@ -38,10 +36,9 @@ export default function Itinerary() {
         ))}
       </Stack>
 
-      {/* Hotel for this night */}
       {hotel && (
         <Alert
-          icon={<HotelIcon />}
+          icon={<Hotel size={18} />}
           severity="info"
           sx={{ mb: 2, borderRadius: 2, bgcolor: '#fffbeb', color: '#92400e', border: '1px solid #fde68a', '& .MuiAlert-icon': { color: '#b45309' } }}
         >
@@ -54,15 +51,13 @@ export default function Itinerary() {
         </Alert>
       )}
 
-      {/* Timeline */}
       <Stack spacing={1.5}>
         {events.map((e, i) => (
           <Card key={i} variant="outlined">
             <CardContent sx={{ display: 'flex', gap: 2, alignItems: 'flex-start', py: '12px !important', px: 2 }}>
-              {/* Time column */}
               <Box sx={{ minWidth: 80, textAlign: 'center' }}>
                 <Box display="flex" alignItems="center" gap={0.5} justifyContent="center">
-                  <AccessTimeIcon sx={{ fontSize: 13, color: 'text.disabled' }} />
+                  <Clock size={12} color="#9ca3af" />
                   <Typography variant="caption" color="text.secondary">{fmt(e.timeStart)}</Typography>
                 </Box>
                 {e.timeFinish && e.timeFinish !== '/' && (
@@ -75,7 +70,6 @@ export default function Itinerary() {
 
               <Divider orientation="vertical" flexItem />
 
-              {/* Content */}
               <Box flex={1}>
                 <Typography variant="body2" fontWeight={500}>{e.activity}</Typography>
                 {e.hkd > 0 && (

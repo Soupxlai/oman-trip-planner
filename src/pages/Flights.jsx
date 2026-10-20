@@ -1,6 +1,5 @@
 import { Box, Card, CardContent, Chip, Typography, Grid, Divider, Stack } from '@mui/material'
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff'
-import FlightLandIcon from '@mui/icons-material/FlightLand'
+import { PlaneTakeoff, PlaneLanding } from 'lucide-react'
 import { flights } from '../data/tripData'
 
 const cabinColors = { Economy: 'info', 'Premium Economy': 'secondary' }
@@ -42,7 +41,7 @@ export default function Flights() {
                 <Grid item xs={12} md={f.inbound && f.inbound !== '/' ? 6 : 12}>
                   <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
                     <Box display="flex" alignItems="center" gap={1} mb={1}>
-                      <FlightTakeoffIcon fontSize="small" color="primary" />
+                      <PlaneTakeoff size={15} color="#b45309" />
                       <Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={600}>Outbound</Typography>
                     </Box>
                     <Typography variant="body1" fontWeight={600}>{f.outbound}</Typography>
@@ -53,7 +52,7 @@ export default function Flights() {
                   <Grid item xs={12} md={6}>
                     <Box sx={{ bgcolor: 'grey.50', borderRadius: 2, p: 2 }}>
                       <Box display="flex" alignItems="center" gap={1} mb={1}>
-                        <FlightLandIcon fontSize="small" color="secondary" />
+                        <PlaneLanding size={15} color="#0891b2" />
                         <Typography variant="caption" color="text.secondary" textTransform="uppercase" fontWeight={600}>Inbound</Typography>
                       </Box>
                       <Typography variant="body1" fontWeight={600}>{f.inbound}</Typography>
